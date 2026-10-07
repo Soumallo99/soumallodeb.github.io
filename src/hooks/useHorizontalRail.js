@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const WHEEL_IDLE_MS = 150
-const WHEEL_EASE = 0.2
+const WHEEL_TIME_CONSTANT = 68
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value))
@@ -110,6 +110,11 @@ export default function useHorizontalRail(reducedMotion = false) {
 
     function pointerIsOverRail(event) {
       updatePointer(event)
+      const eventTargetIsInside = event.target === rail || (typeof Node !== 'undefined' && event.target instanceof Node && rail.contains(event.target))
+      if (eventTargetIsInside) {
+        pointerRef.current.inside = true
+        return true
+      }
       if (!pointerRef.current.inside) return false
 
       const rect = rail.getBoundingClientRect()
@@ -117,13 +122,18 @@ export default function useHorizontalRail(reducedMotion = false) {
       return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
     }
 
-    function animateWheel() {
+    let lastWheelTime = 0
+
+    function animateWheel(timestamp) {
       const target = wheelTargetRef.current
       if (target === null) {
+        lastWheelTime = 0
         wheelFrameRef.current = 0
         return
       }
 
+      const elapsed = lastWheelTime ? Math.min(50, Math.max(1, timestamp - lastWheelTime)) : 16.67
+      lastWheelTime = timestamp
       const distance = target - rail.scrollLeft
       if (Math.abs(distance) <= 0.6) {
         rail.scrollLeft = target
@@ -131,41 +141,31 @@ export default function useHorizontalRail(reducedMotion = false) {
           wheelTargetRef.current = null
           settlingWheelRef.current = false
           rail.removeAttribute('data-wheel-scrolling')
+          lastWheelTime = 0
         }
         wheelFrameRef.current = 0
         return
       }
 
-      rail.scrollLeft += distance * WHEEL_EASE
+      const easing = 1 - Math.exp(-elapsed / WHEEL_TIME_CONSTANT)
+      rail.scrollLeft += distance * easing
       wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
     }
 
     function finishWheelGesture() {
       if (wheelTargetRef.current === null) return
       snapTimerRef.current = 0
+      settlingWheelRef.current = true
 
-      const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth)
-      const target = wheelTargetRef.current
-      const edgeTarget = target <= 1 ? 0 : target >= maxScroll - 1 ? maxScroll : null
-      if (edgeTarget !== null) {
-        if (reducedMotion) {
-          rail.scrollLeft = edgeTarget
-          wheelTargetRef.current = null
-          rail.removeAttribute('data-wheel-scrolling')
-          return
-        }
-        wheelTargetRef.current = edgeTarget
-        settlingWheelRef.current = true
-        if (!wheelFrameRef.current) wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
+      if (reducedMotion) {
+        rail.scrollLeft = wheelTargetRef.current
+        wheelTargetRef.current = null
+        settlingWheelRef.current = false
+        rail.removeAttribute('data-wheel-scrolling')
         return
       }
 
-      if (wheelFrameRef.current) window.cancelAnimationFrame(wheelFrameRef.current)
-      wheelFrameRef.current = 0
-      wheelTargetRef.current = null
-      settlingWheelRef.current = false
-      rail.removeAttribute('data-wheel-scrolling')
-      scrollToIndex(getNearestIndex())
+      if (!wheelFrameRef.current) wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
     }
 
     function handleWheel(event) {
@@ -201,6 +201,7 @@ export default function useHorizontalRail(reducedMotion = false) {
         snapTimerRef.current = 0
         rail.setAttribute('data-wheel-scrolling', 'true')
         wheelTargetRef.current = rail.scrollLeft
+        lastWheelTime = 0
         if (!reducedMotion) wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
       }
 
