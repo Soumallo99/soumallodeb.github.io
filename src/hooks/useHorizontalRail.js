@@ -13,8 +13,11 @@ export default function useHorizontalRail(reducedMotion = false) {
   const activeIndexRef = useRef(0)
   const scrollFrameRef = useRef(0)
   const wheelFrameRef = useRef(0)
+  const pageFrameRef = useRef(0)
   const snapTimerRef = useRef(0)
   const wheelTargetRef = useRef(null)
+  const settlingWheelRef = useRef(false)
+  const pageTargetRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
   const registerItem = useCallback((index, node) => {
@@ -47,9 +50,16 @@ export default function useHorizontalRail(reducedMotion = false) {
     if (wheelFrameRef.current) window.cancelAnimationFrame(wheelFrameRef.current)
     wheelFrameRef.current = 0
     wheelTargetRef.current = null
+    settlingWheelRef.current = false
     window.clearTimeout(snapTimerRef.current)
     snapTimerRef.current = 0
     rail?.removeAttribute('data-wheel-scrolling')
+  }, [])
+
+  const stopPageMotion = useCallback(() => {
+    if (pageFrameRef.current) window.cancelAnimationFrame(pageFrameRef.current)
+    pageFrameRef.current = 0
+    pageTargetRef.current = null
   }, [])
 
   const scrollToIndex = useCallback((index) => {
@@ -58,6 +68,7 @@ export default function useHorizontalRail(reducedMotion = false) {
     if (!rail || !item) return
 
     stopWheelMotion()
+    stopPageMotion()
 
     const railRect = rail.getBoundingClientRect()
     const itemRect = item.getBoundingClientRect()
@@ -66,7 +77,7 @@ export default function useHorizontalRail(reducedMotion = false) {
     const targetLeft = rail.scrollLeft + itemRect.left - railRect.left - centerOffset
     const left = clamp(targetLeft, 0, maxScroll)
     rail.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' })
-  }, [reducedMotion, stopWheelMotion])
+  }, [reducedMotion, stopPageMotion, stopWheelMotion])
 
   const handleScroll = useCallback(() => {
     if (scrollFrameRef.current) window.cancelAnimationFrame(scrollFrameRef.current)
@@ -98,6 +109,48 @@ export default function useHorizontalRail(reducedMotion = false) {
     const rail = railRef.current
     if (!rail) return undefined
 
+    function setPageScroll(top) {
+      const scrollingElement = document.scrollingElement || document.documentElement
+      scrollingElement.scrollTop = top
+    }
+
+    function animatePage() {
+      const target = pageTargetRef.current
+      if (target === null) {
+        pageFrameRef.current = 0
+        return
+      }
+
+      const distance = target - window.scrollY
+      if (Math.abs(distance) <= 0.6) {
+        setPageScroll(target)
+        pageTargetRef.current = null
+        pageFrameRef.current = 0
+        return
+      }
+
+      setPageScroll(window.scrollY + distance * 0.22)
+      pageFrameRef.current = window.requestAnimationFrame(animatePage)
+    }
+
+    function handoffToPage(event) {
+      event.preventDefault()
+      stopWheelMotion()
+
+      const unitScale = event.deltaMode === 1
+        ? 34
+        : event.deltaMode === 2
+          ? window.innerHeight * 0.85
+          : 1.65
+      const maxStep = Math.max(160, Math.min(window.innerHeight * 0.8, 520))
+      const distance = clamp(event.deltaY * unitScale, -maxStep, maxStep)
+      const pageMax = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const currentPage = pageTargetRef.current ?? window.scrollY
+      pageTargetRef.current = clamp(currentPage + distance, 0, pageMax)
+
+      if (!pageFrameRef.current) pageFrameRef.current = window.requestAnimationFrame(animatePage)
+    }
+
     function animateWheel() {
       const target = wheelTargetRef.current
       if (target === null) {
@@ -108,6 +161,11 @@ export default function useHorizontalRail(reducedMotion = false) {
       const distance = target - rail.scrollLeft
       if (Math.abs(distance) <= 0.6) {
         rail.scrollLeft = target
+        if (settlingWheelRef.current) {
+          wheelTargetRef.current = null
+          settlingWheelRef.current = false
+          rail.removeAttribute('data-wheel-scrolling')
+        }
         wheelFrameRef.current = 0
         return
       }
@@ -118,9 +176,28 @@ export default function useHorizontalRail(reducedMotion = false) {
 
     function finishWheelGesture() {
       if (wheelTargetRef.current === null) return
+      snapTimerRef.current = 0
+
+      const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth)
+      const target = wheelTargetRef.current
+      const edgeTarget = target <= 1 ? 0 : target >= maxScroll - 1 ? maxScroll : null
+      if (edgeTarget !== null) {
+        if (reducedMotion) {
+          rail.scrollLeft = edgeTarget
+          wheelTargetRef.current = null
+          rail.removeAttribute('data-wheel-scrolling')
+          return
+        }
+        wheelTargetRef.current = edgeTarget
+        settlingWheelRef.current = true
+        if (!wheelFrameRef.current) wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
+        return
+      }
+
       if (wheelFrameRef.current) window.cancelAnimationFrame(wheelFrameRef.current)
       wheelFrameRef.current = 0
       wheelTargetRef.current = null
+      settlingWheelRef.current = false
       rail.removeAttribute('data-wheel-scrolling')
       scrollToIndex(getNearestIndex())
     }
@@ -128,27 +205,36 @@ export default function useHorizontalRail(reducedMotion = false) {
     function handleWheel(event) {
       const verticalDominant = Math.abs(event.deltaY) > Math.abs(event.deltaX)
       if (!event.deltaY || !verticalDominant) {
-        if (event.deltaX) stopWheelMotion()
+        if (event.deltaX) {
+          stopWheelMotion()
+          stopPageMotion()
+        }
         return
       }
 
       const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth)
       const direction = Math.sign(event.deltaY)
       const currentTarget = wheelTargetRef.current ?? rail.scrollLeft
-      const atStart = direction < 0 && rail.scrollLeft <= 1 && currentTarget <= 1
-      const atEnd = direction > 0 && rail.scrollLeft >= maxScroll - 1 && currentTarget >= maxScroll - 1
+      const atStart = direction < 0 && currentTarget <= 1
+      const atEnd = direction > 0 && currentTarget >= maxScroll - 1
 
-      // Hand control back to the page at either edge instead of trapping vertical scroll.
+      // Once the rail has no useful horizontal distance left, transfer the same
+      // wheel gesture to the document instead of making the user scroll again.
       if (maxScroll <= 0 || atStart || atEnd) {
-        stopWheelMotion()
+        if (maxScroll > 0) {
+          rail.scrollLeft = atStart ? 0 : maxScroll
+        }
+        handoffToPage(event)
         return
       }
 
+      stopPageMotion()
+      settlingWheelRef.current = false
       event.preventDefault()
 
       if (wheelTargetRef.current === null) {
         // Interrupt a previous smooth snap before accepting a new gesture.
-        rail.scrollTo({ left: rail.scrollLeft, behavior: 'auto' })
+        rail.scrollLeft = rail.scrollLeft
         window.clearTimeout(snapTimerRef.current)
         snapTimerRef.current = 0
         rail.setAttribute('data-wheel-scrolling', 'true')
@@ -177,10 +263,11 @@ export default function useHorizontalRail(reducedMotion = false) {
     return () => {
       rail.removeEventListener('wheel', handleWheel)
       stopWheelMotion()
+      stopPageMotion()
       if (scrollFrameRef.current) window.cancelAnimationFrame(scrollFrameRef.current)
       scrollFrameRef.current = 0
     }
-  }, [getNearestIndex, reducedMotion, scrollToIndex, stopWheelMotion])
+  }, [getNearestIndex, reducedMotion, scrollToIndex, stopPageMotion, stopWheelMotion])
 
   return {
     railRef,
