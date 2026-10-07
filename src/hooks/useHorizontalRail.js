@@ -186,8 +186,18 @@ export default function useHorizontalRail(reducedMotion = false) {
       // Do not synthesize vertical page movement. When horizontal movement is
       // exhausted, leave the event untouched so the browser can scroll the page.
       if (maxScroll <= 0 || atStart || atEnd) {
-        if (maxScroll > 0) rail.scrollLeft = atStart ? 0 : maxScroll
-        stopWheelMotion()
+        if (maxScroll <= 0 || wheelTargetRef.current === null || reducedMotion) {
+          if (maxScroll > 0) rail.scrollLeft = atStart ? 0 : maxScroll
+          stopWheelMotion()
+          return
+        }
+
+        // Let the browser begin moving the page while the rail finishes its
+        // last few pixels. Keeping this settle frame alive removes the hard
+        // stop at the horizontal/vertical boundary.
+        wheelTargetRef.current = atStart ? 0 : maxScroll
+        settlingWheelRef.current = true
+        if (!wheelFrameRef.current) wheelFrameRef.current = window.requestAnimationFrame(animateWheel)
         return
       }
 
