@@ -83,7 +83,7 @@ export default function Contact() {
               method="POST"
               onSubmit={handleSubmit}
             >
-              <input type="hidden" name="_subject" value="New project enquiry for Kade Voss" />
+              <input type="hidden" name="_subject" value="New project enquiry for Soumallo Deb" />
               <div className="form-field">
                 <label htmlFor="contact-name">Name</label>
                 <input

@@ -1,4 +1,4 @@
-# Kade Voss — Developer Portfolio
+# Soumallo Deb — Developer Portfolio
 
 A responsive, dark glassmorphic portfolio site built with React, Vite, Tailwind CSS, and Framer Motion. Surreal 3D hero forms, spring-driven pointer tilt, continuous transforms, a moving capabilities band, and scroll-linked section motion give the experience depth; reduced-motion preferences are respected. It is a fully static single-page site: there are no server-side routes, backend API routes, or database. The contact form submits from the browser to Formspree.
 

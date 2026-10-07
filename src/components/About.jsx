@@ -14,7 +14,7 @@ export default function About() {
         <Reveal className="about-heading">
           <SectionHeading id="about-title" eyebrow="A little about me / 04" title="About" />
           <div className="about-monogram glass-panel" aria-hidden="true">
-            <span>K</span><span>V</span><i />
+            <span>S</span><span>D</span><i />
             <small>DEVELOPER<br />BY DESIGN</small>
           </div>
         </Reveal>
@@ -22,7 +22,7 @@ export default function About() {
         <div className="about-content">
           <Reveal>
             <p className="about-statement">
-              I&apos;m Kade Voss, a developer specializing in AI-accelerated web development. I combine agentic AI coding tools with standard engineering practices — GitHub version control, proper hosting, and clean handover — to deliver professional websites and web apps faster and more affordably than traditional agencies.
+              I&apos;m Soumallo Deb, a developer specializing in AI-accelerated web development. I combine agentic AI coding tools with standard engineering practices — GitHub version control, proper hosting, and clean handover — to deliver professional websites and web apps faster and more affordably than traditional agencies.
             </p>
           </Reveal>
           <div className="principles-grid">

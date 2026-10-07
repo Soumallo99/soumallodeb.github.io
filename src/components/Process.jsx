@@ -73,7 +73,7 @@ export default function Process() {
             description="A transparent path from first conversation to a site you can confidently own."
           />
           <div className="process-stamp glass-panel">
-            <span className="stamp-mark">KV<span>.</span></span>
+            <span className="stamp-mark">SD<span>.</span></span>
             <span><strong>No black boxes.</strong><small>Clear steps, clean handover.</small></span>
           </div>
         </Reveal>

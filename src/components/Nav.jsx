@@ -24,10 +24,10 @@ export default function Nav() {
     <header className="site-header">
       <motion.div className="page-scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
       <nav className="site-container nav-shell" aria-label="Main navigation">
-        <a className="brand" href="#home" onClick={closeMenu} aria-label="Kade Voss, home">
-          <span className="brand-mark">K<span>V</span><i>.</i></span>
+        <a className="brand" href="#home" onClick={closeMenu} aria-label="Soumallo Deb, home">
+          <span className="brand-mark">S<span>D</span><i>.</i></span>
           <span className="brand-text">
-            <strong>Kade Voss</strong>
+            <strong>Soumallo Deb</strong>
             <small>Web developer</small>
           </span>
         </a>
