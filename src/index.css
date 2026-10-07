@@ -922,6 +922,7 @@ svg {
   scroll-snap-type: x proximity;
   scroll-padding-inline: 18px;
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -1076,6 +1077,7 @@ svg {
   scroll-snap-type: x proximity;
   scroll-padding-inline: clamp(28px, 4vw, 52px);
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   scrollbar-width: none;
   transform-style: preserve-3d;
   -webkit-overflow-scrolling: touch;

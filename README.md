@@ -44,8 +44,8 @@ The current endpoint is intentionally a placeholder. Until it is replaced, submi
 
 ### Replace portfolio placeholders
 
-- Replace the three clearly labeled speculative project concepts in `src/components/Work.jsx` with real work when ready. The project rail supports smooth vertical mouse-wheel-to-horizontal scrolling, native touch/trackpad scrolling, arrow controls, and a smooth handoff back to page scrolling at either edge; its project CTA currently points to Contact.
-- The services rail in `src/components/Services.jsx` contains seven editable concept offerings, including business websites, full-stack web apps, AI-powered features, commerce, product design, automation, and performance/SEO. It uses the same smooth horizontal scrolling and edge handoff pattern and can be edited as the offering evolves.
+- Replace the three clearly labeled speculative project concepts in `src/components/Work.jsx` with real work when ready. The project rail supports smooth vertical mouse-wheel-to-horizontal scrolling, native touch/trackpad scrolling, arrow controls, and releases control back to the browser’s native page scrolling at either edge; its project CTA currently points to Contact.
+- The services rail in `src/components/Services.jsx` contains seven editable concept offerings, including business websites, full-stack web apps, AI-powered features, commerce, product design, automation, and performance/SEO. It uses the same pointer-aware horizontal scrolling and native edge behavior and can be edited as the offering evolves.
 - Update the clearly marked `YOUR_*` social link placeholders in `src/components/SocialLinks.jsx`.
 - Review the canonical and Open Graph URLs in `index.html` if the deployed domain changes. The social share card is `public/og-card.png` (with an editable SVG source alongside it).
 
