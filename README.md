@@ -1,1 +1,68 @@
-# kadevoss.github.io
+# Kade Voss — Developer Portfolio
+
+A responsive, dark glassmorphic portfolio site built with React, Vite, Tailwind CSS, and Framer Motion. Surreal 3D hero forms, spring-driven pointer tilt, continuous transforms, a moving capabilities band, and scroll-linked section motion give the experience depth; reduced-motion preferences are respected. It is a fully static single-page site: there are no server-side routes, backend API routes, or database. The contact form submits from the browser to Formspree.
+
+## Run locally
+
+Requires Node.js 22 or later and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Vite prints the local preview URL (normally `http://localhost:5173`). To check a production build locally:
+
+```bash
+npm run build
+npm run preview
+```
+
+The deployable static files are written to `dist/`.
+
+## Deploy to GitHub Pages
+
+This repository is named `kadevoss.github.io`, so it is configured as a GitHub Pages user site served from the domain root. `vite.config.js` sets `base: '/'`, which is the correct asset path for this repository.
+
+A GitHub Actions workflow is included at `.github/workflows/deploy.yml`. To deploy:
+
+1. Push or merge the site to the repository's `main` branch.
+2. In GitHub, open **Settings → Pages** and set the build/deployment source to **GitHub Actions**.
+3. The workflow installs dependencies, builds the static site, and publishes `dist/` to Pages. You can also run it with **Actions → Deploy to GitHub Pages → Run workflow**.
+
+If you later deploy this as a project site under `https://<username>.github.io/<repository>/`, change the Vite `base` value to `'/<repository>/'` before building. Keep `'/'` for the current `kadevoss.github.io` user-site repository.
+
+## Before launch
+
+### Connect the contact form
+
+1. Create a form at [Formspree](https://formspree.io/) and copy its form ID.
+2. In `src/components/Contact.jsx`, replace `YOUR_FORM_ID` in `FORMSPREE_ENDPOINT` with that ID, keeping the `https://formspree.io/f/` prefix.
+3. Submit a test message from the deployed page and confirm it arrives in the inbox configured in Formspree.
+
+The current endpoint is intentionally a placeholder. Until it is replaced, submitting the form displays a setup message and does not send data anywhere.
+
+### Replace portfolio placeholders
+
+- Replace the three clearly labeled speculative project concepts in `src/components/Work.jsx` with real work when ready. The project rail supports smooth vertical mouse-wheel-to-horizontal scrolling, native touch/trackpad scrolling, and arrow controls; its project CTA currently points to Contact.
+- The services rail in `src/components/Services.jsx` contains seven editable concept offerings, including business websites, full-stack web apps, AI-powered features, commerce, product design, automation, and performance/SEO. It uses the same smooth horizontal scrolling pattern and can be edited as the offering evolves.
+- Update the clearly marked `YOUR_*` social link placeholders in `src/components/SocialLinks.jsx`.
+- Review the canonical and Open Graph URLs in `index.html` if the deployed domain changes. The social share card is `public/og-card.png` (with an editable SVG source alongside it).
+
+No real email address, phone number, or social profile is included in the starter content.
+
+## Project structure
+
+```text
+.
+├── .github/workflows/deploy.yml
+├── public/                  # Static favicon and social share card
+├── src/
+│   ├── components/          # Page sections and reusable UI
+│   ├── App.jsx
+│   ├── index.css            # Tailwind layers and custom responsive styles
+│   └── main.jsx
+├── index.html               # SEO and Open Graph metadata
+├── package.json
+└── vite.config.js            # GitHub Pages base and Vite plugins
+```

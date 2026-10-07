@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0v40" stroke="#b8e66a" stroke-opacity=".075"/>
+    </pattern>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(450 285 -240 380 875 315)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c5f36a" stop-opacity=".19"/>
+      <stop offset="1" stop-color="#c5f36a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="#080b09" d="M0 0h1200v630H0z"/>
+  <path fill="url(#grid)" d="M0 0h1200v630H0z"/>
+  <path fill="url(#glow)" d="M0 0h1200v630H0z"/>
+  <rect x="82" y="77" width="52" height="52" rx="16" fill="#101612" stroke="#c5f36a" stroke-opacity=".35"/>
+  <path d="M96 91h6v14l12-14h8l-11 12 12 15h-8l-9-11-4 4v7h-6V91Z" fill="#f4f7f0"/>
+  <circle cx="124" cy="120" r="3" fill="#c5f36a"/>
+  <text x="154" y="109" fill="#dce5d9" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="2">KADE VOSS</text>
+  <text x="82" y="285" fill="#f4f7f0" font-family="Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-3">AI-Powered</text>
+  <text x="82" y="374" fill="#c5f36a" font-family="Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-3">Web Developer</text>
+  <text x="86" y="441" fill="#a4ada4" font-family="Arial, sans-serif" font-size="23">Real code. Thoughtful engineering. Yours to own.</text>
+  <rect x="86" y="503" width="11" height="11" rx="5.5" fill="#c5f36a"/>
+  <text x="111" y="514" fill="#dce5d9" font-family="Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">AI-ASSISTED / HUMAN-REVIEWED / PRODUCTION-READY</text>
+</svg>

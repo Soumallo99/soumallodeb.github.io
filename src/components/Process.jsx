@@ -1,0 +1,85 @@
+import { useRef } from 'react'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import Reveal from './Reveal.jsx'
+import SectionHeading from './SectionHeading.jsx'
+
+const steps = [
+  {
+    title: 'Start with the why',
+    description: 'Understand your business goals and requirements',
+    label: 'DISCOVERY',
+  },
+  {
+    title: 'Build for production',
+    description: 'Build your site using an AI-assisted development pipeline — real production code, not templates',
+    label: 'DEVELOPMENT',
+  },
+  {
+    title: 'Review every change',
+    description: 'Every change is version-controlled and reviewed via GitHub before deployment',
+    label: 'QUALITY CHECK',
+  },
+  {
+    title: 'Your accounts, your code',
+    description: 'Final website and hosting are set up under your own accounts — you own everything, no vendor lock-in',
+    label: 'OWNERSHIP',
+  },
+  {
+    title: 'A clear handover',
+    description: 'Full documentation of credentials, costs, and maintenance provided',
+    label: 'HANDOVER',
+  },
+]
+
+function ProcessTimeline() {
+  const timelineRef = useRef(null)
+  const shouldReduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start 76%', 'end 70%'],
+  })
+  const progressY = useTransform(scrollYProgress, [0, 1], [0, 1])
+
+  return (
+    <div className="process-list" ref={timelineRef}>
+      <span className="process-progress-track" aria-hidden="true" />
+      {!shouldReduceMotion && <motion.span className="process-progress" style={{ scaleY: progressY }} aria-hidden="true" />}
+      {steps.map((step, index) => (
+        <Reveal key={step.label} delay={index * 0.06} className="process-reveal">
+          <article className="process-item">
+            <span className="process-number">{String(index + 1).padStart(2, '0')}</span>
+            <div className="process-copy">
+              <p className="process-label">{step.label}</p>
+              <h3>{step.title}</h3>
+              <p className="process-description">{step.description}</p>
+            </div>
+            <a className="process-arrow" href="#contact" aria-label={`Discuss ${step.title} with me`}>↗</a>
+          </article>
+        </Reveal>
+      ))}
+    </div>
+  )
+}
+
+export default function Process() {
+  return (
+    <section className="section-pad section-process" id="process" aria-labelledby="process-title">
+      <div className="site-container process-layout">
+        <Reveal className="process-intro">
+          <SectionHeading
+            id="process-title"
+            eyebrow="The way I work / 02"
+            title="My Process"
+            description="A transparent path from first conversation to a site you can confidently own."
+          />
+          <div className="process-stamp glass-panel">
+            <span className="stamp-mark">KV<span>.</span></span>
+            <span><strong>No black boxes.</strong><small>Clear steps, clean handover.</small></span>
+          </div>
+        </Reveal>
+
+        <ProcessTimeline />
+      </div>
+    </section>
+  )
+}
